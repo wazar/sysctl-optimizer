@@ -2,6 +2,22 @@
 
 Automatically optimize Linux kernel parameters (sysctl) for your server. Detects hardware, generates optimized configuration, tests each parameter, and applies only what works.
 
+## About
+
+This project is a hardened, production-ready fork of the original [sysctl-Generator](https://github.com/ENGINYRING/sysctl-Generator) by ENGINYRING. It has been completely rewritten with extensive error handling, parameter testing, and additional features for enterprise use.
+
+## Key Improvements Over Original
+
+- **Individual Parameter Testing**: Tests every parameter individually, disables unsupported ones
+- **Container Detection**: Detects Docker/LXC/Kubernetes and warns about limitations
+- **BBR Detection**: Automatically uses BBR if available, falls back to cubic
+- **Dry Run Mode**: Preview changes without applying
+- **Force Mode**: For automation/CI usage
+- **Extensive Error Handling**: Won't crash on unexpected inputs
+- **Bounds Checking**: Safe values with min/max limits
+- **Backup & Rollback**: Creates timestamped backups
+- **Production Ready**: Used in production environments
+
 ## Features
 
 - **Zero Configuration**: Auto-detects CPU, RAM, network speed, and disk type
@@ -127,12 +143,12 @@ sudo sysctl -p
 
 ## Credits
 
-Based on optimization research from:
-- [sysctl-Generator](https://github.com/ENGINYRING/sysctl-Generator)
-- Linux kernel documentation
-- Google BBR research
-- Red Hat Performance Tuning Guide
+**Original Project**: [sysctl-Generator](https://github.com/ENGINYRING/sysctl-Generator) by ENGINYRING
+
+This project builds upon the research and foundation laid by the original sysctl-Generator. The optimization approaches, hardware detection methods, and parameter calculations were inspired by the original work.
+
+**Additional Research**: Linux kernel documentation, Google BBR research, Red Hat Performance Tuning Guide
 
 ## License
 
-MIT License
+MIT License - Same as the original project
