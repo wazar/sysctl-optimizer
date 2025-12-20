@@ -32,7 +32,7 @@ This project is a hardened, production-ready fork of the original [sysctl-Genera
 
 ```bash
 # Download
-curl -O https://raw.githubusercontent.com/YOUR_USERNAME/sysctl-optimizer/main/auto-optimize-sysctl.sh
+curl -O https://raw.githubusercontent.com/wazar/sysctl-optimizer/master/auto-optimize-sysctl.sh
 chmod +x auto-optimize-sysctl.sh
 
 # Run (interactive)
@@ -108,7 +108,7 @@ Options:
 [OK] Testing complete: 95/95 parameters work
 
 [INFO] Backing up current configuration...
-[OK] Backup created: /etc/sysctl.conf.backup.20251220-120000
+[OK] Backup created: /etc/sysctl.conf.backup.20250120-143022
 
 [OK] Configuration applied successfully!
 ```
@@ -119,7 +119,7 @@ Options:
 # List backups
 ls -la /etc/sysctl.conf.backup.*
 
-# Restore
+# Restore (replace with your backup timestamp)
 sudo cp /etc/sysctl.conf.backup.YYYYMMDD-HHMMSS /etc/sysctl.conf
 sudo sysctl -p
 ```
