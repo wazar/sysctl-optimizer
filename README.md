@@ -51,10 +51,20 @@ sudo ./auto-optimize-sysctl.sh --force
 Usage: auto-optimize-sysctl.sh [OPTIONS]
 
 Options:
-  -d, --dry-run     Generate and test config without applying
-  -f, --force       Skip confirmation prompt
-  -v, --verbose     Show detailed output
-  -h, --help        Show this help message
+  -d, --dry-run          Generate and test config without applying
+  -f, --force            Skip confirmation prompt
+  -n, --nic-speed SPEED  Override detected NIC speed (in Mbps)
+  -v, --verbose          Show detailed output
+  -h, --help             Show this help message
+```
+
+### Virtual Machines
+
+VMs often report 1Gbps regardless of actual network capability. Use `--nic-speed` to override:
+
+```bash
+# Force 10Gbps tuning on VMs
+sudo ./auto-optimize-sysctl.sh --nic-speed 10000
 ```
 
 ## What Gets Optimized
