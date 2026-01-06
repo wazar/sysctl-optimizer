@@ -49,6 +49,7 @@ IS_CONTAINER=false
 DRY_RUN=false
 FORCE=false
 VERBOSE=false
+NIC_SPEED_OVERRIDE=""
 
 # Counters for testing
 TOTAL_PARAMS=0
@@ -248,20 +249,24 @@ detect_network() {
         fi
     fi
 
-    # Detect speed
-    if [[ -n "$ACTIVE_IF" && "$ACTIVE_IF" != "unknown" ]]; then
-        local speed_file="/sys/class/net/${ACTIVE_IF}/speed"
-        if [[ -f "$speed_file" ]]; then
-            local speed
-            speed=$(cat "$speed_file" 2>/dev/null) || speed=""
-            # Speed can be -1 if unknown, or non-numeric
-            if [[ "$speed" =~ ^[0-9]+$ ]] && [[ "$speed" -gt 0 ]]; then
-                NIC_SPEED=$speed
+    # Detect speed (unless overridden)
+    if [[ -n "$NIC_SPEED_OVERRIDE" ]]; then
+        NIC_SPEED=$NIC_SPEED_OVERRIDE
+        log_success "Using override: ${ACTIVE_IF} at ${NIC_SPEED} Mbps (user-specified)"
+    else
+        if [[ -n "$ACTIVE_IF" && "$ACTIVE_IF" != "unknown" ]]; then
+            local speed_file="/sys/class/net/${ACTIVE_IF}/speed"
+            if [[ -f "$speed_file" ]]; then
+                local speed
+                speed=$(cat "$speed_file" 2>/dev/null) || speed=""
+                # Speed can be -1 if unknown, or non-numeric
+                if [[ "$speed" =~ ^[0-9]+$ ]] && [[ "$speed" -gt 0 ]]; then
+                    NIC_SPEED=$speed
+                fi
             fi
         fi
+        log_success "Detected: ${ACTIVE_IF} at ${NIC_SPEED} Mbps"
     fi
-
-    log_success "Detected: ${ACTIVE_IF} at ${NIC_SPEED} Mbps"
 }
 
 detect_disk() {
@@ -772,15 +777,18 @@ Usage: $SCRIPT_NAME [OPTIONS]
 Automatically optimize sysctl parameters for your system.
 
 Options:
-  -d, --dry-run     Generate and test config without applying
-  -f, --force       Skip confirmation prompt
-  -v, --verbose     Show detailed output
-  -h, --help        Show this help message
+  -d, --dry-run          Generate and test config without applying
+  -f, --force            Skip confirmation prompt
+  -n, --nic-speed SPEED  Override detected NIC speed (in Mbps)
+                         Use 10000 for 10Gbps tuning on VMs
+  -v, --verbose          Show detailed output
+  -h, --help             Show this help message
 
 Examples:
-  sudo $SCRIPT_NAME              # Interactive mode
-  sudo $SCRIPT_NAME --dry-run    # Preview changes
-  sudo $SCRIPT_NAME --force      # Apply without confirmation
+  sudo $SCRIPT_NAME                    # Interactive mode
+  sudo $SCRIPT_NAME --dry-run          # Preview changes
+  sudo $SCRIPT_NAME --force            # Apply without confirmation
+  sudo $SCRIPT_NAME --nic-speed 10000  # Force 10Gbps network tuning
 
 EOF
     exit 0
@@ -804,6 +812,16 @@ parse_args() {
             -v|--verbose)
                 VERBOSE=true
                 shift
+                ;;
+            -n|--nic-speed)
+                if [[ -z "${2:-}" ]]; then
+                    die "Option --nic-speed requires a value (e.g., --nic-speed 10000)"
+                fi
+                if ! is_positive_integer "$2"; then
+                    die "Invalid NIC speed: $2 (must be a positive integer in Mbps)"
+                fi
+                NIC_SPEED_OVERRIDE="$2"
+                shift 2
                 ;;
             -h|--help)
                 usage
